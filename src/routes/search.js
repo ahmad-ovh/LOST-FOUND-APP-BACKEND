@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { searchLostItem } = require('../controllers/searchController');
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Search route is working!' });
-});
+router.post('/', searchLostItem); // POST /api/v1/search
 
 module.exports = router;
