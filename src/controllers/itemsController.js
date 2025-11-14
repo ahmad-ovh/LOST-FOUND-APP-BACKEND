@@ -21,7 +21,7 @@ const createItem = async (req, res) => {
     return res.status(201).json(newItem);
   } catch (err) {
     if (err.name === 'ZodError') {
-      return res.status(400).json({ error: err.errors.map(e => e.message).join(', ') });
+      return res.status(400).json({ error: err.issues.map(e => e.message).join(', ') });
     }
     console.error(err);
     return res.status(500).json({ error: 'Server error' });
