@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Items route is working!' });
-});
+const { createItem, getAllItems, getItemById } = require('../controllers/itemsController');
+
+router.post('/', createItem);       // POST /api/v1/items
+router.get('/', getAllItems);       // GET /api/v1/items
+router.get('/:id', getItemById);    // GET /api/v1/items/:id
 
 module.exports = router;
