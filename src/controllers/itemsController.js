@@ -74,6 +74,9 @@ const getAllItems = async (req, res) => {
     const response = items.map(i => ({
       ...i.toObject(),
       image: convertImageToBase64(i.image),
+      summary: i.summary || '',
+      category: i.category || '',
+      tags: i.tags || [],   
     }));
 
     return res.status(200).json(response);
