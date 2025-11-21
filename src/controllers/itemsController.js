@@ -6,14 +6,26 @@ const AI = require('../services/aiService');
 const createItem = async (req, res) => {
   try {
     const parsed = createItemSchema.parse(req.body);
+    let submittedAt = new Date();
+    if (parsed.date && parsed.time) {
+      const [day, month, year] = parsed.date.split('/');
+      const [hours, minutes] = parsed.time.split(':');
+      submittedAt = new Date(year, month - 1, day, hours, minutes);
+    }
+
     const aiResult = await AI.processItemDescription(parsed.description);
 
-    // Init new item w/ aiResult
     const newItem = new Item({
-      ...parsed,
-      description: aiResult.summary,
+      name: parsed.name,
+      description: parsed.description,   // keep original
+      summary: aiResult.summary,         // AI summary
       category: aiResult.category,
       tags: aiResult.tags,
+      location: parsed.place,
+      address: parsed.address || null,
+      contact: parsed.contact,
+      imageUrl: parsed.image || null,
+      submittedAt,
     });
 
     await newItem.save();
