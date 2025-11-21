@@ -12,7 +12,7 @@ const createItemSchema = z.object({
   date: z.string().regex(dateRegex, "Invalid date format DD/MM/YYYY").optional(),
   time: z.string().regex(timeRegex, "Invalid time format HH:MM").optional(),
 
-  image: z.string().optional(), //swtched to string incase file is uploaded/base64
+  image: z.string().optional(), // base64 enc string atm, i hope..
   address: z.string().optional(),
 });
 

@@ -15,6 +15,18 @@ const createItem = async (req, res) => {
 
     const aiResult = await AI.processItemDescription(parsed.description);
 
+    // base64 -> buffer
+    let imageData = null;
+    let contentType = null;
+
+    if (parsed.image) {
+      const matches = parsed.image.match(/^data:(.+);base64,(.+)$/);
+      if (matches) {
+        contentType = matches[1];
+        imageData = Buffer.from(matches[2], "base64");
+      }
+    }
+
     const newItem = new Item({
       name: parsed.name,
       description: parsed.description,   // keep original
@@ -24,7 +36,9 @@ const createItem = async (req, res) => {
       location: parsed.place,
       address: parsed.address || null,
       contact: parsed.contact,
-      imageUrl: parsed.image || null,
+      image: imageData
+        ? { data: imageData, contentType }
+        : undefined,
       submittedAt,
     });
 

@@ -13,8 +13,12 @@ const itemSchema = new mongoose.Schema({
   address: { type: String },  // self reminder: useless at the moment, incase GMAPS is implemented - just added for REST API structure
 
   contact: { type: String, required: true },
-  imageUrl: { type: String, default: null },
-
+  
+  // Switched to buffer for easier mongoDB handling
+    image: {
+      data: Buffer,
+      contentType: String
+  },
   submittedAt: { type: Date },  // user inputted time & date merged
   createdAt: { type: Date, default: Date.now }, // when was report sent
 });
