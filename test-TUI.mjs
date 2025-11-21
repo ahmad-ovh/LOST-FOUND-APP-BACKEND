@@ -1,7 +1,6 @@
-// Lazy created AI script for TUI based testing. [Tool]
 import inquirer from 'inquirer';
 import axios from 'axios';
-
+import fs from 'fs';
 
 const API_BASE = 'http://localhost:5000/api/v1';
 
@@ -40,13 +39,43 @@ const createItem = async () => {
   const answers = await inquirer.prompt([
     { name: 'name', message: 'Item name:' },
     { name: 'description', message: 'Description:' },
-    { name: 'location', message: 'Location:' },
-    { name: 'contact', message: 'Contact (email/phone):' },
-    { name: 'imageUrl', message: 'Image URL (optional):', default: '' },
+    { name: 'place', message: 'Place where item was found:' },
+    { name: 'contact', message: 'Contact (email):' },
+    { name: 'date', message: 'Date (DD/MM/YYYY) (optional):', default: '' },
+    { name: 'time', message: 'Time (HH:MM) (optional):', default: '' },
+    { name: 'address', message: 'Address (optional):', default: '' },
+    {
+      name: 'imagePath',
+      message: 'Path to image file (optional):',
+      default: '',
+    },
   ]);
 
+  // Convert image to base64 if provided
+  let imageBase64 = '';
+  if (answers.imagePath) {
+    try {
+      const buffer = fs.readFileSync(answers.imagePath);
+      const ext = answers.imagePath.split('.').pop();
+      imageBase64 = `data:image/${ext};base64,${buffer.toString('base64')}`;
+    } catch (err) {
+      console.warn('⚠️ Could not read image file. Skipping image.');
+    }
+  }
+
+  const payload = {
+    name: answers.name,
+    description: answers.description,
+    place: answers.place,
+    contact: answers.contact,
+    date: answers.date || undefined,
+    time: answers.time || undefined,
+    address: answers.address || undefined,
+    image: imageBase64 || undefined,
+  };
+
   try {
-    const res = await axios.post(`${API_BASE}/items`, answers);
+    const res = await axios.post(`${API_BASE}/items`, payload);
     console.log('✅ Item created:', res.data);
   } catch (err) {
     console.error('❌ Error:', err.response?.data || err.message);
@@ -63,7 +92,11 @@ const getAllItems = async () => {
 
   try {
     const res = await axios.get(`${API_BASE}/items`, { params: answers });
-    console.log('📦 Items:', res.data);
+    console.log('📦 Items:');
+    res.data.forEach((item) => {
+      console.log(`- [${item.id}] ${item.name} (${item.place})`);
+      if (item.image) console.log('  📷 Image available (base64)');
+    });
   } catch (err) {
     console.error('❌ Error:', err.response?.data || err.message);
   }
@@ -77,6 +110,7 @@ const getItemById = async () => {
   try {
     const res = await axios.get(`${API_BASE}/items/${id}`);
     console.log('📄 Item:', res.data);
+    if (res.data.image) console.log('📷 Image available (base64)');
   } catch (err) {
     console.error('❌ Error:', err.response?.data || err.message);
   }
@@ -89,7 +123,11 @@ const searchLostItem = async () => {
 
   try {
     const res = await axios.post(`${API_BASE}/search`, { query });
-    console.log('🔎 Search results:', res.data);
+    console.log('🔎 Search results:');
+    res.data.forEach((result) => {
+      console.log(`- [${result.item.id}] ${result.item.name} (Match: ${result.matchPercentage})`);
+      if (result.item.image) console.log('  📷 Image available (base64)');
+    });
   } catch (err) {
     console.error('❌ Error:', err.response?.data || err.message);
   }
