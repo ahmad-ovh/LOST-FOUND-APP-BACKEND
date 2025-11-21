@@ -22,16 +22,22 @@ const matchLostItem = async (query, simplifiedItems) => {
   const prompt = getMatchItemPrompt(query, simplifiedItems);
   const raw = await callDeepSeek(prompt);
 
+  let matches;
   try {
-    const matches = JSON.parse(raw);
-    return matches.map(m => ({
-      id: simplifiedItems[m.index].id,
-      matchPercentage: m.matchPercentage
-    }));
+    matches = JSON.parse(raw.trim());
   } catch {
-    console.error('Failed to parse AI match output');
-    throw new Error('DeepSeek match parsing failed');
+    const match = raw.match(/\[.*\]/s);
+    if (match) matches = JSON.parse(match[0]);
+    else {
+      console.error('Failed to parse AI match output:', raw);
+      throw new Error('DeepSeek match parsing failed');
+    }
   }
+
+  return matches.map(m => ({
+    id: simplifiedItems[m.index].id,
+    matchPercentage: m.matchPercentage
+  }));
 };
 
 module.exports = {
