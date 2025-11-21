@@ -54,6 +54,12 @@ const createItem = async (req, res) => {
   }
 };
 
+const convertImageToBase64 = (image) => {
+  if (!image || !image.data) return null;
+  return `data:${image.contentType};base64,${image.data.toString('base64')}`;
+};
+
+
 const getAllItems = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -65,7 +71,13 @@ const getAllItems = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    return res.status(200).json(items);
+    const response = items.map(i => ({
+      ...i.toObject(),
+      image: convertImageToBase64(i.image),
+    }));
+
+    return res.status(200).json(response);
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Server error' });
@@ -77,7 +89,10 @@ const getItemById = async (req, res) => {
     const item = await Item.findOne({ id: req.params.id });
     if (!item) return res.status(404).json({ error: 'Item not found' });
 
-    return res.status(200).json(item);
+    return res.status(200).json({
+      ...item.toObject(),
+      image: convertImageToBase64(item.image),
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Server error' });
