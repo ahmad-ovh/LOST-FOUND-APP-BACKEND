@@ -1,34 +1,40 @@
-//LAZY stub o(--(
+const { callDeepSeek } = require('../utils/deepseekEngine');
+const { getProcessItemPrompt } = require('./itemProcessor');
+const { getMatchItemPrompt } = require('./aimatcher');
+
 const processItemDescription = async (description) => {
-    //self reminder to put some actual deepseek calls here...
-  return {
-    category: 'Electronics',
-    summary: description, // For now, just echo
-    tags: ['sample', 'tag'],
-  };
-};
-const matchLostItem = async (query, itemList) => {
-  // another call
-  const results = itemList.map(item => {
-    const score = query
-      .toLowerCase()
-      .split(' ')
-      .reduce((acc, word) => {
-        if (
-          item.name.toLowerCase().includes(word) ||
-          item.description.toLowerCase().includes(word) ||
-          item.tags.some(t => t.toLowerCase().includes(word))
-        ) {
-          return acc + 0.2;
-        }
-        return acc;
-      }, 0);
+  const prompt = getProcessItemPrompt(description);
+  const raw = await callDeepSeek(prompt);
 
-    return { id: item.id, matchPercentage: Math.min(score, 1) };
-  });
-
-  return results;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    console.warn('Failed to parse AI output, falling back to defaults');
+    return {
+      category: 'Other',
+      summary: description,
+      tags: []
+    };
+  }
 };
+
+const matchLostItem = async (query, simplifiedItems) => {
+  const prompt = getMatchItemPrompt(query, simplifiedItems);
+  const raw = await callDeepSeek(prompt);
+
+  try {
+    const matches = JSON.parse(raw);
+    return matches.map(m => ({
+      id: simplifiedItems[m.index].id,
+      matchPercentage: m.matchPercentage
+    }));
+  } catch {
+    console.error('Failed to parse AI match output');
+    throw new Error('DeepSeek match parsing failed');
+  }
+};
+
 module.exports = {
   processItemDescription,
+  matchLostItem
 };
