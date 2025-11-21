@@ -39,7 +39,7 @@ const createItem = async () => {
   const answers = await inquirer.prompt([
     { name: 'name', message: 'Item name:' },
     { name: 'description', message: 'Description:' },
-    { name: 'place', message: 'Place where item was found:' },
+    { name: 'location', message: 'Location where item was found:' },
     { name: 'contact', message: 'Contact (email):' },
     { name: 'date', message: 'Date (DD/MM/YYYY) (optional):', default: '' },
     { name: 'time', message: 'Time (HH:MM) (optional):', default: '' },
@@ -66,7 +66,7 @@ const createItem = async () => {
   const payload = {
     name: answers.name,
     description: answers.description,
-    place: answers.place,
+    location: answers.location,
     contact: answers.contact,
     date: answers.date || undefined,
     time: answers.time || undefined,
