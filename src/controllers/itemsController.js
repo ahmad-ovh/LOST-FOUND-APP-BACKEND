@@ -33,7 +33,7 @@ const createItem = async (req, res) => {
       summary: aiResult.summary,         // AI summary
       category: aiResult.category,
       tags: aiResult.tags,
-      location: parsed.place,
+      location: parsed.location,
       address: parsed.address || null,
       contact: parsed.contact,
       image: imageData

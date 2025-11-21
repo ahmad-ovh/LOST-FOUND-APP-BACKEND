@@ -6,7 +6,7 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/; // HH:MM (24h)
 const createItemSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
-  place: z.string().min(1),
+  location: z.string().min(1),
   contact: z.email(),
 
   date: z.string().regex(dateRegex, "Invalid date format DD/MM/YYYY").optional(),

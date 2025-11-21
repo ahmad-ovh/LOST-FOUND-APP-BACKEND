@@ -94,7 +94,7 @@ const getAllItems = async () => {
     const res = await axios.get(`${API_BASE}/items`, { params: answers });
     console.log('📦 Items:');
     res.data.forEach((item) => {
-      console.log(`- [${item.id}] ${item.name} (${item.place})`);
+      console.log(`- [${item.id}] ${item.name} (${item.location})`);
       if (item.image) console.log('  📷 Image available (base64)');
     });
   } catch (err) {
