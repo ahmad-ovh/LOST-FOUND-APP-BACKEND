@@ -125,7 +125,7 @@ const searchLostItem = async () => {
     const res = await axios.post(`${API_BASE}/search`, { query });
     console.log('🔎 Search results:');
     res.data.forEach((result) => {
-      console.log(`- [${result.item.id}] ${result.item.name} (Match: ${result.matchPercentage})`);
+      console.log(`- [${result.item.id}] ${result.item.name} (Match: ${(result.matchPercentage*100).toFixed(2)}%)`);
       if (result.item.image) console.log('  📷 Image available (base64)');
     });
   } catch (err) {
