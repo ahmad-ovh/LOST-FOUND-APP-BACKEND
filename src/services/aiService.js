@@ -1,6 +1,6 @@
 const { callDeepSeek } = require('../utils/deepseekEngine');
 const { getProcessItemPrompt } = require('./itemProcessor');
-const { getMatchItemPrompt } = require('./aimatcher');
+const { getMatchItemPrompt } = require('./aiMatcher');
 
 const processItemDescription = async (description) => {
   const prompt = getProcessItemPrompt(description);
